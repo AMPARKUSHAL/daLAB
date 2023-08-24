@@ -1,39 +1,62 @@
-def dfs(node, graph, visited, component):
-    visited[node] = True
-    component.append(node)
-    
-    for neighbor, connected in enumerate(graph[node]):
-        if connected and not visited[neighbor]:
-            dfs(neighbor, graph, visited, component)
 
-def find_connected_components(graph):
-    num_nodes = len(graph)
-    visited = [False] * num_nodes
-    components = []
-    
-    for node in range(num_nodes):
-        if not visited[node]:
-            component = []
-            dfs(node, graph, visited, component)
-            components.append(component)
-    
-    return components
+#include <stdio.h>
+#include <stdbool.h>
 
-def main():
-    # Example adjacency matrix representing a social network
-    adjacency_matrix = [
-        [0, 1, 0, 0, 1],    
-        [1, 0, 1, 0, 0],
-        [0, 1, 0, 1, 0],
-        [0, 0, 1, 0, 0],
-        [1, 0, 0, 0, 0]
-    ]
-    
-    connected_components = find_connected_components(adjacency_matrix)
-    
-    print("Connected Components:")
-    for component in connected_components:
-        print(component)
+#define MAX_VERTICES 100
 
-if __name__ == "__main__":
-    main()
+int graph[MAX_VERTICES][MAX_VERTICES];
+int visited[MAX_VERTICES];
+int vertices;
+
+void initGraph() {
+    for (int i = 0; i < MAX_VERTICES; i++) {
+        for (int j = 0; j < MAX_VERTICES; j++) {
+            graph[i][j] = 0;
+        }
+        visited[i] = 0;
+    }
+}
+
+void addEdge(int src, int dest) {
+    graph[src][dest] = 1;
+    graph[dest][src] = 1;
+}
+
+void dfs(int vertex) {
+    visited[vertex] = 1;
+    printf("%d ", vertex);
+
+    for (int i = 0; i < vertices; i++) {
+        if (graph[vertex][i] && !visited[i]) {
+            dfs(i);
+        }
+    }
+}
+
+void findConnectedComponents() {
+    for (int i = 0; i < vertices; i++) {
+        if (!visited[i]) {
+            dfs(i);
+            printf("\n");
+        }
+    }
+}
+
+int main() {
+    printf("Enter the number of vertices: ");
+    scanf("%d", &vertices);
+
+    initGraph();
+
+    printf("Enter the adjacency matrix:\n");
+    for (int i = 0; i < vertices; i++) {
+        for (int j = 0; j < vertices; j++) {
+            scanf("%d", &graph[i][j]);
+        }
+    }
+
+    printf("Connected components:\n");
+    findConnectedComponents();
+
+    return 0;
+}
