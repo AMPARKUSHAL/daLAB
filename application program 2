@@ -1,0 +1,59 @@
+def merge_sort(arr):
+    if len(arr) > 1:
+        mid = len(arr) // 2
+        left_half = arr[:mid]
+        right_half = arr[mid:]
+
+        merge_sort(left_half)
+        merge_sort(right_half)
+
+        i, j, k = 0, 0, 0
+
+        while i < len(left_half) and j < len(right_half):
+            if left_half[i] < right_half[j]:
+                arr[k] = left_half[i]
+                i += 1
+            else:
+                arr[k] = right_half[j]
+                j += 1
+            k += 1
+
+        while i < len(left_half):
+            arr[k] = left_half[i]
+            i += 1
+            k += 1
+
+        while j < len(right_half):
+            arr[k] = right_half[j]
+            j += 1
+            k += 1
+
+def main():
+    source = input("Enter 'file' to read from a file, or 'input' for user input: ")
+
+    if source == "file":
+        filename = input("Enter the filename: ")
+        try:
+            with open(filename, 'r') as file:
+                mobile_numbers = file.read().splitlines()
+        except FileNotFoundError:
+            print("File not found.")
+            return
+    elif source == "input":
+        num_numbers = int(input("Enter the number of mobile numbers: "))
+        mobile_numbers = []
+        for i in range(num_numbers):
+            number = input(f"Enter mobile number {i + 1}: ")
+            mobile_numbers.append(number)
+    else:
+        print("Invalid input source.")
+        return
+
+    merge_sort(mobile_numbers)
+
+    print("Sorted Mobile Numbers:")
+    for number in mobile_numbers:
+        print(number)
+
+if __name__ == "__main__":
+    main()
