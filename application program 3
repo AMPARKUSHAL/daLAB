@@ -22,7 +22,7 @@ def find_connected_components(graph):
 def main():
     # Example adjacency matrix representing a social network
     adjacency_matrix = [
-        [0, 1, 0, 0, 1],mMmM    
+        [0, 1, 0, 0, 1],    
         [1, 0, 1, 0, 0],
         [0, 1, 0, 1, 0],
         [0, 0, 1, 0, 0],
