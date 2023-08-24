@@ -1,0 +1,39 @@
+def dfs(node, graph, visited, component):
+    visited[node] = True
+    component.append(node)
+    
+    for neighbor, connected in enumerate(graph[node]):
+        if connected and not visited[neighbor]:
+            dfs(neighbor, graph, visited, component)
+
+def find_connected_components(graph):
+    num_nodes = len(graph)
+    visited = [False] * num_nodes
+    components = []
+    
+    for node in range(num_nodes):
+        if not visited[node]:
+            component = []
+            dfs(node, graph, visited, component)
+            components.append(component)
+    
+    return components
+
+def main():
+    # Example adjacency matrix representing a social network
+    adjacency_matrix = [
+        [0, 1, 0, 0, 1],mMmM    
+        [1, 0, 1, 0, 0],
+        [0, 1, 0, 1, 0],
+        [0, 0, 1, 0, 0],
+        [1, 0, 0, 0, 0]
+    ]
+    
+    connected_components = find_connected_components(adjacency_matrix)
+    
+    print("Connected Components:")
+    for component in connected_components:
+        print(component)
+
+if __name__ == "__main__":
+    main()
