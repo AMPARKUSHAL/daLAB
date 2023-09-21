@@ -1,0 +1,105 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <limits.h>
+
+// Define a structure to represent an edge
+struct Edge {
+    int src, dest, weight;
+};
+
+// Define a structure to represent a graph
+struct Graph {
+    int V, E;
+    struct Edge* edge;
+};
+
+// Create a graph with V vertices and E edges
+struct Graph* createGraph(int V, int E) {
+    struct Graph* graph = (struct Graph*)malloc(sizeof(struct Graph));
+    graph->V = V;
+    graph->E = E;
+    graph->edge = (struct Edge*)malloc(E * sizeof(struct Edge));
+    return graph;
+}
+
+// Initialize the distance array with maximum values
+void initialize(int dist[], int V, int source) {
+    for (int i = 0; i < V; i++) {
+        if (i == source)
+            dist[i] = 0;
+        else
+            dist[i] = INT_MAX;
+    }
+}
+
+// Relaxation function to update distances
+void relax(int dist[], struct Graph* graph) {
+    int V = graph->V;
+    int E = graph->E;
+    for (int i = 0; i < V - 1; i++) {
+        for (int j = 0; j < E; j++) {
+            int u = graph->edge[j].src;
+            int v = graph->edge[j].dest;
+            int weight = graph->edge[j].weight;
+            if (dist[u] != INT_MAX && dist[u] + weight < dist[v]) {
+                dist[v] = dist[u] + weight;
+            }
+        }
+    }
+}
+
+// Function to detect and print negative-weight cycles
+int detectNegativeCycle(int dist[], struct Graph* graph) {
+    int V = graph->V;
+    int E = graph->E;
+    for (int j = 0; j < E; j++) {
+        int u = graph->edge[j].src;
+        int v = graph->edge[j].dest;
+        int weight = graph->edge[j].weight;
+        if (dist[u] != INT_MAX && dist[u] + weight < dist[v]) {
+            return 1; // Negative cycle detected
+        }
+    }
+    return 0; // No negative cycle
+}
+
+// Print the shortest distances from the source city
+void printDistances(int dist[], int V) {
+    printf("Vertex\tDistance from Source\n");
+    for (int i = 0; i < V; i++) {
+        printf("%d\t%d\n", i, dist[i]);
+    }
+}
+
+int main() {
+    int V, E, source;
+    printf("Enter the number of vertices and edges: ");
+    scanf("%d %d", &V, &E);
+
+    struct Graph* graph = createGraph(V, E);
+
+    printf("Enter the source city: ");
+    scanf("%d", &source);
+
+    printf("Enter the edges (source, destination, weight):\n");
+    for (int i = 0; i < E; i++) {
+        scanf("%d %d %d", &graph->edge[i].src, &graph->edge[i].dest, &graph->edge[i].weight);
+    }
+
+    int dist[V];
+    initialize(dist, V, source);
+
+    relax(dist, graph);
+
+    if (detectNegativeCycle(dist, graph)) {
+        printf("Negative-weight cycle detected. Cannot compute shortest paths.\n");
+    } else {
+        printf("Shortest distances from source city %d:\n", source);
+        printDistances(dist, V);
+    }
+
+    free(graph->edge);
+    free(graph);
+
+    return 0;
+}
