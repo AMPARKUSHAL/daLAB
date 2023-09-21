@@ -1,34 +1,128 @@
-class Graph:
-    def __init__(self):
-        self.graph = {}
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdbool.h>
 
-    def add_edge(self, u, v):
-        if u not in self.graph:
-            self.graph[u] = []
-        self.graph[u].append(v)
+// Define a structure to represent a node in the graph
+struct Node {
+    int data;
+    struct Node* next;
+};
 
-    def dfs(self, start):
-        visited = set()
+// Define a structure to represent a queue
+struct Queue {
+    struct Node* front;
+    struct Node* rear;
+};
 
-        def dfs_recursive(node):
-            if node not in visited:
-                print(node, end=" ")
-                visited.add(node)
-                if node in self.graph:
-                    for neighbor in self.graph[node]:
-                        dfs_recursive(neighbor)
+// Function to create a new node
+struct Node* createNode(int data) {
+    struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));
+    newNode->data = data;
+    newNode->next = NULL;
+    return newNode;
+}
 
-        dfs_recursive(start)
+// Function to create a new queue
+struct Queue* createQueue() {
+    struct Queue* queue = (struct Queue*)malloc(sizeof(struct Queue));
+    queue->front = queue->rear = NULL;
+    return queue;
+}
 
-# Example usage:
-if __name__ == "__main__":
-    g = Graph()
-    g.add_edge(0, 1)
-    g.add_edge(0, 2)
-    g.add_edge(1, 2)
-    g.add_edge(2, 0)
-    g.add_edge(2, 3)
-    g.add_edge(3, 3)
+// Function to enqueue an item
+void enqueue(struct Queue* queue, int data) {
+    struct Node* newNode = createNode(data);
+    if (queue->rear == NULL) {
+        queue->front = queue->rear = newNode;
+        return;
+    }
+    queue->rear->next = newNode;
+    queue->rear = newNode;
+}
 
-    print("Depth-First Search starting from node 2:")
-    g.dfs(2)
+// Function to dequeue an item
+int dequeue(struct Queue* queue) {
+    if (queue->front == NULL)
+        return -1;
+    int data = queue->front->data;
+    struct Node* temp = queue->front;
+    queue->front = queue->front->next;
+    if (queue->front == NULL)
+        queue->rear = NULL;
+    free(temp);
+    return data;
+}
+
+// Structure to represent a graph
+struct Graph {
+    int vertices;
+    struct Node** adjList;
+    bool* visited;
+};
+
+// Function to create a graph with 'vertices' number of vertices
+struct Graph* createGraph(int vertices) {
+    struct Graph* graph = (struct Graph*)malloc(sizeof(struct Graph));
+    graph->vertices = vertices;
+    graph->adjList = (struct Node**)malloc(vertices * sizeof(struct Node*));
+    graph->visited = (bool*)malloc(vertices * sizeof(bool));
+
+    for (int i = 0; i < vertices; i++) {
+        graph->adjList[i] = NULL;
+        graph->visited[i] = false;
+    }
+
+    return graph;
+}
+
+// Function to add an edge to the graph
+void addEdge(struct Graph* graph, int src, int dest) {
+    struct Node* newNode = createNode(dest);
+    newNode->next = graph->adjList[src];
+    graph->adjList[src] = newNode;
+
+    newNode = createNode(src);
+    newNode->next = graph->adjList[dest];
+    graph->adjList[dest] = newNode;
+}
+
+// Function to perform BFS traversal of the graph
+void bfs(struct Graph* graph, int startVertex) {
+    struct Queue* queue = createQueue();
+    graph->visited[startVertex] = true;
+    enqueue(queue, startVertex);
+
+    printf("Breadth-First Traversal starting from vertex %d: ", startVertex);
+
+    while (queue->front != NULL) {
+        int currentVertex = dequeue(queue);
+        printf("%d ", currentVertex);
+
+        struct Node* temp = graph->adjList[currentVertex];
+        while (temp != NULL) {
+            int adjacentVertex = temp->data;
+            if (!graph->visited[adjacentVertex]) {
+                graph->visited[adjacentVertex] = true;
+                enqueue(queue, adjacentVertex);
+            }
+            temp = temp->next;
+        }
+    }
+
+    printf("\n");
+}
+
+int main() {
+    struct Graph* graph = createGraph(4);
+
+    addEdge(graph, 0, 1);
+    addEdge(graph, 0, 2);
+    addEdge(graph, 1, 2);
+    addEdge(graph, 2, 0);
+    addEdge(graph, 2, 3);
+    addEdge(graph, 3, 3);
+
+    bfs(graph, 2);
+
+    return 0;
+}
